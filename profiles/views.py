@@ -1,11 +1,11 @@
-from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
-from .serializers import ProfileSerializer
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateAPIView
+from .serializers import ProfileSerializer, SimpleProfileSerializer
 from .models import Profile
 
 
 class AddInformationView(CreateAPIView):
     """
-    Endpoint que Adiciona as informações básicas no perfil do usuário
+    Endpoint que Lista/Adiciona as informações básicas no perfil do usuário
     Devem ser passados os seguintes atributos:
 
     descricao (String): Descrição do usuário, uma apresentação
@@ -31,3 +31,8 @@ class MyInformationView(RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user.profile
+
+
+class ListProfileView(ListAPIView):
+    serializer_class = SimpleProfileSerializer
+    queryset = Profile.get_browsable()

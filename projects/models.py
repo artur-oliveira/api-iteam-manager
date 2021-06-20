@@ -8,13 +8,11 @@ from django.db.models import Q
 from categories.models import Categoria
 
 
-class UsuarioProjeto(models.Model):
+class UsuarioRecusado(models.Model):
     projeto = models.ForeignKey('Projeto', on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     visualizou = models.BooleanField(default=False)
 
-
-class UsuarioRecusado(UsuarioProjeto):
     @staticmethod
     def salvar(projeto, user, visualizou=False):
         try:
@@ -35,7 +33,11 @@ class UsuarioRecusado(UsuarioProjeto):
         return self.__str__()
 
 
-class UsuarioAceito(UsuarioProjeto):
+class UsuarioAceito(models.Model):
+    projeto = models.ForeignKey('Projeto', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visualizou = models.BooleanField(default=False)
+
     @staticmethod
     def salvar(projeto, user, visualizou=False):
         try:
@@ -56,7 +58,11 @@ class UsuarioAceito(UsuarioProjeto):
         return self.__str__()
 
 
-class UsuarioBanido(UsuarioProjeto):
+class UsuarioBanido(models.Model):
+    projeto = models.ForeignKey('Projeto', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visualizou = models.BooleanField(default=False)
+
     @staticmethod
     def salvar(projeto, user, visualizou=False):
         try:
@@ -77,7 +83,11 @@ class UsuarioBanido(UsuarioProjeto):
         return self.__str__()
 
 
-class UsuarioAdvertido(UsuarioProjeto):
+class UsuarioAdvertido(models.Model):
+    projeto = models.ForeignKey('Projeto', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visualizou = models.BooleanField(default=False)
+
     @staticmethod
     def salvar(projeto, user, visualizou=False):
         try:
@@ -98,7 +108,11 @@ class UsuarioAdvertido(UsuarioProjeto):
         return self.__str__()
 
 
-class UsuarioGratificado(UsuarioProjeto):
+class UsuarioGratificado(models.Model):
+    projeto = models.ForeignKey('Projeto', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visualizou = models.BooleanField(default=False)
+
     @staticmethod
     def salvar(projeto, user, visualizou=False):
         try:
@@ -119,7 +133,11 @@ class UsuarioGratificado(UsuarioProjeto):
         return self.__str__()
 
 
-class UsuarioConvidado(UsuarioProjeto):
+class UsuarioConvidado(models.Model):
+    projeto = models.ForeignKey('Projeto', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visualizou = models.BooleanField(default=False)
+
     @staticmethod
     def salvar(projeto, user, visualizou=False):
         try:
@@ -175,8 +193,7 @@ class Projeto(models.Model):
 
     @staticmethod
     def projetos_que_participa(user):
-        return Projeto.objects.filter(participantes__in=user).order_by('-data_criacao')
-        # return Projeto.objects.filter(Q(criador=user) | Q(participantes=user)).order_by('-data_criacao').distinct()
+        return Projeto.objects.filter(Q(criador=user) | Q(participantes=user)).order_by('-data_criacao').distinct()
 
     @staticmethod
     def projetos_para_explorar(user):
@@ -203,6 +220,9 @@ class Projeto(models.Model):
                 self.share_hash = self.id_generator(size=20)
 
         super(Projeto, self).save(force_insert, force_update, using, update_fields)
+
+    def has_access(self, user: User):
+        return self.criador_id == user.id or self.administrador_id == user.id
 
     def __str__(self):
         return self.nome

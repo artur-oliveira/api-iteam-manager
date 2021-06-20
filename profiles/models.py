@@ -21,6 +21,11 @@ class Profile(models.Model):
     perfil_classifier = models.IntegerField(default=0)
 
     @staticmethod
+    def get_browsable():
+        return Profile.objects.filter(mostrar_perfil=True, user__is_superuser=False,
+                                      user__is_staff=False, user__is_active=True)
+
+    @staticmethod
     def id_generator(size=15, chars=string.ascii_letters + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
 

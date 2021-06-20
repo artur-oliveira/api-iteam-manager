@@ -9,7 +9,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
-        read_only_fields = ('user', )
+        read_only_fields = ('user',)
 
     @classmethod
     def get_user(cls, instance: Profile):
@@ -36,3 +36,27 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class SimpleProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('id', 'descricao', 'interesses', 'invite_url', 'gratificado',
+                  'advertencias', 'banido', 'perfil_classifier', 'first_name', 'last_name')
+        read_only_fields = ('user',)
+
+    first_name = serializers.SerializerMethodField(read_only=True)
+    last_name = serializers.SerializerMethodField(read_only=True)
+    invite_url = serializers.SerializerMethodField(read_only=True)
+
+    @staticmethod
+    def get_first_name(instance):
+        return instance.user.first_name
+
+    @staticmethod
+    def get_last_name(instance):
+        return instance.user.last_name
+
+    @staticmethod
+    def get_invite_url(instance):
+        return instance.url_hash
