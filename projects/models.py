@@ -33,6 +33,31 @@ class UsuarioRecusado(models.Model):
         return self.__str__()
 
 
+class UsuarioConviteRecusado(models.Model):
+    projeto = models.ForeignKey('Projeto', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visualizou = models.BooleanField(default=False)
+
+    @staticmethod
+    def salvar(projeto, user, visualizou=False):
+        try:
+            u = UsuarioRecusado.objects.get(projeto=projeto, user=user)
+            u.visualizou = visualizou
+            u.save()
+            return u
+
+        except UsuarioRecusado.DoesNotExist:
+            u = UsuarioRecusado(projeto=projeto, user=user, visualizou=visualizou)
+            u.save()
+            return u
+
+    def __str__(self):
+        return '%s recusado %s' % (self.user.first_name, self.projeto.nome)
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class UsuarioAceito(models.Model):
     projeto = models.ForeignKey('Projeto', on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -174,6 +199,8 @@ class Projeto(models.Model):
     pendentes = models.ManyToManyField(User, related_name='usuarios_pendentes', blank=True)
     recusados = models.ManyToManyField(User, related_name='usuarios_recusados', blank=True,
                                        through=UsuarioRecusado)
+    convites_recusados = models.ManyToManyField(User, related_name='usuarios_convite_recusados', blank=True,
+                                                through=UsuarioConviteRecusado)
     convidados = models.ManyToManyField(User, related_name='usuarios_convidados', blank=True, through=UsuarioConvidado)
     banidos = models.ManyToManyField(User, related_name='usuarios_banidos', blank=True, through=UsuarioBanido)
 
@@ -201,7 +228,7 @@ class Projeto(models.Model):
         banido = [int(a.get('projeto')) for a in UsuarioBanido.objects.filter(user=user).values('projeto')]
         recusado = [int(a.get('projeto')) for a in UsuarioRecusado.objects.filter(user=user).values('projeto')]
 
-        return Projeto.objects.filter(privado=False, encerrado=False).\
+        return Projeto.objects.filter(privado=False, encerrado=False). \
             exclude(id__in=participando).exclude(id__in=banido).exclude(id__in=recusado)
 
     @staticmethod

@@ -1,6 +1,8 @@
 from rest_framework.generics import ListCreateAPIView, CreateAPIView
 from .models import Projeto
-from .serializers import ProjetoSerializer, RequestParticipationSerializer, AcceptParticipationSerializer
+from .serializers import (ProjetoSerializer, RequestParticipationSerializer, AcceptParticipationSerializer,
+                          DenyParticipationSerializer, RequestInviteSerializer, AcceptInviteSerializer,
+                          DeclineInviteSerializer)
 
 
 class ListCreateProjectView(ListCreateAPIView):
@@ -54,8 +56,42 @@ class AcceptParticipationView(CreateAPIView):
         return []
 
 
-class InviteView(CreateAPIView):
+class DenyParticipationView(CreateAPIView):
     """
-    Endpoint responsável pela aceitação da solicitação feita por um outro usuário, o usuário que aceitar deve possuir os
-    privilégios necessários
+        Endpoint responsável pela negação da solicitação feita por um outro usuário, o usuário que negar deve possuir os
+        privilégios necessários
+        """
+    serializer_class = DenyParticipationSerializer
+
+    def get_queryset(self):
+        return []
+
+
+class RequestInviteView(CreateAPIView):
     """
+    Endpoint responsável pelo convite de novos usuários no projeto
+    """
+    serializer_class = RequestInviteSerializer
+
+    def get_queryset(self):
+        return []
+
+
+class AcceptInviteView(CreateAPIView):
+    """
+    Endpoint responsável pela aceitação do convite
+    """
+    serializer_class = AcceptInviteSerializer
+
+    def get_queryset(self):
+        return []
+
+
+class DeclineInviteView(CreateAPIView):
+    """
+    Endpoint responsável pela aceitação do convite
+    """
+    serializer_class = DeclineInviteSerializer
+
+    def get_queryset(self):
+        return []
